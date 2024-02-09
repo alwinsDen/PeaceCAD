@@ -12,9 +12,9 @@ void clicked_button(GtkApplication *app,gpointer user_data){
 }
 
 //get the mouse position on live
-void pos_targets(GtkWidget *button, std::string x, std::string y){
+void pos_targets(GtkTextBuffer *buffer, std::string x, std::string y){
     //combine the string
     std::string comb_pos = "X: "+x+"    Y "+y;
     const char *fmt_text = comb_pos.c_str();
-    gtk_button_set_label(GTK_BUTTON(button),fmt_text);
+    gtk_text_buffer_set_text(buffer, fmt_text, -1);
 }

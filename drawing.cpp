@@ -11,7 +11,7 @@ static cairo_surface_t *surface = NULL;
 //struct definitions
 struct CustomPosData {
     std::string xyz;
-    GtkWidget *widget;
+    GtkTextBuffer *widget;
 };
 
 //don't use the static keyword here.
@@ -152,7 +152,6 @@ void activate_drawing(GtkApplication *app, gpointer user_data) {
 
     frame = gtk_frame_new(NULL);
 
-    gtk_box_append(GTK_BOX(box),frame);
 
     drawing_area = gtk_drawing_area_new();
     gtk_widget_set_size_request(drawing_area, 1920, 1080);
@@ -162,18 +161,23 @@ void activate_drawing(GtkApplication *app, gpointer user_data) {
     //the signal for resizing
     g_signal_connect_after(drawing_area, "resize", G_CALLBACK(resize_cb), NULL);
 
+    //adding text box
+    GtkWidget *text_box;
+    GtkTextBuffer *buffer;
+    text_box = gtk_text_view_new();
+    buffer =  gtk_text_view_get_buffer(GTK_TEXT_VIEW(text_box));
+
+    //here we are defining the content for the CustomPostData struct
+    CustomPosData *data = new CustomPosData();
+    data->xyz = "Hey there";
+    data->widget = buffer;
+
     //Adding button to the UI
     GtkWidget *button = gtk_button_new_with_label("Click Here");
     g_signal_connect(button,"clicked",G_CALLBACK(clicked_button),NULL);
-    gtk_box_append(GTK_BOX(box),button);
 
     //trying to link motion position
     GtkEventController *motion = gtk_event_controller_motion_new();
-
-    //here we are defining the content for the CustomPostData strutc
-    CustomPosData *data = new CustomPosData();
-    data->xyz = "Hey there";
-    data->widget = button;
 
     g_signal_connect(motion, "motion", G_CALLBACK(get_cursor_position), data);
     gtk_widget_add_controller(drawing_area, GTK_EVENT_CONTROLLER(motion));
@@ -192,6 +196,11 @@ void activate_drawing(GtkApplication *app, gpointer user_data) {
     gtk_widget_add_controller(drawing_area, GTK_EVENT_CONTROLLER(press));
 
     g_signal_connect(press, "pressed", G_CALLBACK(pressed), drawing_area);
+
+    //GTK Box material controls
+    gtk_box_append(GTK_BOX(box),frame);
+    gtk_box_append(GTK_BOX(box),text_box);
+//    gtk_box_append(GTK_BOX(box),button); //unused button
 
     gtk_window_present(GTK_WINDOW(window));
 }

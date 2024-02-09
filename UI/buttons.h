@@ -9,6 +9,6 @@
 #include<iostream>
 
 void clicked_button(GtkApplication *app,gpointer user_data);
-void pos_targets(GtkWidget *button, std::string x, std::string y);
+void pos_targets(GtkTextBuffer *buffer, std::string x, std::string y);
 
 #endif //TEST_BUTTONS_H
