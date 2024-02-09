@@ -1,7 +1,7 @@
 //
 // Created by alwint on 8/2/24.
 //
-
+#include <iostream>
 #include "drawing.h"
 #include <gtk/gtk.h>
 
@@ -59,6 +59,8 @@ void draw_brush(GtkWidget *widget, double x, double y) {
     cairo_fill(cr);
     cairo_destroy(cr);
     // invalidating drawing area.
+    // this functions redraws the current painting when draw_brush is repeatedly
+    //called
     gtk_widget_queue_draw(widget);
 }
 
@@ -95,11 +97,21 @@ void drag_end(
     draw_brush(area, start_x + x, start_y + y);
 }
 
+//Get realtime postion of cursor
+void get_cursor_position(
+        GtkEventControllerMotion *controller,
+        double x,
+        double y,
+        GtkWidget *widget
+) {
+    std::cout << "X: "<<x<<"Y: "<< y << "\n";
+}
+
 void pressed(GtkGestureClick *gesture,
              int n_press,
              double x,
              double y,
-             GtkWidget *area){
+             GtkWidget *area) {
     clear_surface();
     gtk_widget_queue_draw(area);
 }
@@ -126,12 +138,17 @@ void activate_drawing(GtkApplication *app, gpointer user_data) {
     frame = gtk_frame_new(NULL);
     gtk_window_set_child(GTK_WINDOW(window), frame);
     drawing_area = gtk_drawing_area_new();
-    gtk_widget_set_size_request(drawing_area, 100, 100);
+    gtk_widget_set_size_request(drawing_area, 1920, 1080);
     gtk_frame_set_child(GTK_FRAME(frame), drawing_area);
     gtk_drawing_area_set_draw_func(GTK_DRAWING_AREA(drawing_area), draw_cb, NULL, NULL);
 
     //the signal for resizing
     g_signal_connect_after(drawing_area, "resize", G_CALLBACK(resize_cb), NULL);
+
+    //trying to link motion position
+    GtkEventController *motion = gtk_event_controller_motion_new();
+    g_signal_connect(motion, "motion", G_CALLBACK(get_cursor_position), drawing_area);
+    gtk_widget_add_controller(drawing_area, GTK_EVENT_CONTROLLER(motion));
 
     drag = gtk_gesture_drag_new();
     gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(drag), GDK_BUTTON_PRIMARY);
@@ -143,10 +160,10 @@ void activate_drawing(GtkApplication *app, gpointer user_data) {
     g_signal_connect(drag, "drag-end", G_CALLBACK(drag_end), drawing_area);
 
     press = gtk_gesture_click_new();
-    gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(press),GDK_BUTTON_SECONDARY);
-    gtk_widget_add_controller(drawing_area,GTK_EVENT_CONTROLLER(press));
+    gtk_gesture_single_set_button(GTK_GESTURE_SINGLE(press), GDK_BUTTON_SECONDARY);
+    gtk_widget_add_controller(drawing_area, GTK_EVENT_CONTROLLER(press));
 
-    g_signal_connect(press,"pressed", G_CALLBACK(pressed), drawing_area);
+    g_signal_connect(press, "pressed", G_CALLBACK(pressed), drawing_area);
 
     gtk_window_present(GTK_WINDOW(window));
 }
