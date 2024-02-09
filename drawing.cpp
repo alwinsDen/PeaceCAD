@@ -126,17 +126,25 @@ void activate_drawing(GtkApplication *app, gpointer user_data) {
     GtkWidget *window;
     GtkWidget *frame;
     GtkWidget *drawing_area;
+    GtkWidget *box;
     GtkGesture *drag;
     GtkGesture *press;
-
     window = gtk_application_window_new(app);
     gtk_window_set_title(GTK_WINDOW(window), "Drawing area");
+
+    //adding box the frame
+    box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
+    gtk_widget_set_halign(box, GTK_ALIGN_CENTER);
+    gtk_widget_set_valign(box, GTK_ALIGN_CENTER);
+    gtk_window_set_child(GTK_WINDOW(window),box);
 
     //the signal for closing function
     g_signal_connect(window, "destroy", G_CALLBACK(close_window), NULL);
 
     frame = gtk_frame_new(NULL);
-    gtk_window_set_child(GTK_WINDOW(window), frame);
+
+    gtk_box_append(GTK_BOX(box),frame);
+
     drawing_area = gtk_drawing_area_new();
     gtk_widget_set_size_request(drawing_area, 1920, 1080);
     gtk_frame_set_child(GTK_FRAME(frame), drawing_area);
