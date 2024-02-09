@@ -10,5 +10,7 @@ include_directories(${GTK4_INCLUDE_DIRS})
 
 add_executable(${PROJECT_NAME} main.cpp
         test3.cpp
-        test3.h)
+        test3.h
+        drawing.cpp
+        drawing.h)
 target_link_libraries(${PROJECT_NAME} ${GTK4_LIBRARIES})
