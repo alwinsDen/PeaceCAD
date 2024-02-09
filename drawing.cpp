@@ -4,8 +4,15 @@
 #include <iostream>
 #include "drawing.h"
 #include <gtk/gtk.h>
+#include "UI/buttons.h"
 
 static cairo_surface_t *surface = NULL;
+
+//struct definitions
+struct CustomPosData {
+    std::string xyz;
+    GtkWidget *widget;
+};
 
 //don't use the static keyword here.
 //clear the whiteboard
@@ -102,9 +109,11 @@ void get_cursor_position(
         GtkEventControllerMotion *controller,
         double x,
         double y,
-        GtkWidget *widget
+        gpointer user_data
 ) {
-    std::cout << "X: "<<x<<"Y: "<< y << "\n";
+    //deserializing a struct
+    CustomPosData *data = static_cast<CustomPosData* >(user_data);
+    pos_targets(data->widget,std::to_string(x),std::to_string(y));
 }
 
 void pressed(GtkGestureClick *gesture,
@@ -153,9 +162,20 @@ void activate_drawing(GtkApplication *app, gpointer user_data) {
     //the signal for resizing
     g_signal_connect_after(drawing_area, "resize", G_CALLBACK(resize_cb), NULL);
 
+    //Adding button to the UI
+    GtkWidget *button = gtk_button_new_with_label("Click Here");
+    g_signal_connect(button,"clicked",G_CALLBACK(clicked_button),NULL);
+    gtk_box_append(GTK_BOX(box),button);
+
     //trying to link motion position
     GtkEventController *motion = gtk_event_controller_motion_new();
-    g_signal_connect(motion, "motion", G_CALLBACK(get_cursor_position), drawing_area);
+
+    //here we are defining the content for the CustomPostData strutc
+    CustomPosData *data = new CustomPosData();
+    data->xyz = "Hey there";
+    data->widget = button;
+
+    g_signal_connect(motion, "motion", G_CALLBACK(get_cursor_position), data);
     gtk_widget_add_controller(drawing_area, GTK_EVENT_CONTROLLER(motion));
 
     drag = gtk_gesture_drag_new();

@@ -12,5 +12,7 @@ add_executable(${PROJECT_NAME} main.cpp
         test3.cpp
         test3.h
         drawing.cpp
-        drawing.h)
+        drawing.h
+        UI/buttons.cpp
+        UI/buttons.h)
 target_link_libraries(${PROJECT_NAME} ${GTK4_LIBRARIES})

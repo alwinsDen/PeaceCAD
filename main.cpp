@@ -2,6 +2,7 @@
 #include <gtk/gtk.h>
 #include "test3.h"
 #include "drawing.h"
+#include "UI/buttons.h"
 
 //related functions
 //test3: activate
