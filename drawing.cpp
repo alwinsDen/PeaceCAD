@@ -165,6 +165,7 @@ void activate_drawing(GtkApplication *app, gpointer user_data) {
     GtkWidget *text_box;
     GtkTextBuffer *buffer;
     text_box = gtk_text_view_new();
+    gtk_text_view_set_editable(GTK_TEXT_VIEW(text_box), FALSE);
     buffer =  gtk_text_view_get_buffer(GTK_TEXT_VIEW(text_box));
 
     //here we are defining the content for the CustomPostData struct
