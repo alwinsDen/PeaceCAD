@@ -14,7 +14,7 @@ void pos_targets(GtkTextBuffer *buffer, std::string x, std::string y);
 
 GtkWidget *writ_button();
 
-void create_grid(GtkWidget *widget,cairo_t *cr, gpointer user_data);
+void create_grid(GtkDrawingArea *widget, gpointer user_data);
 
 //button UIs export
 GtkWidget *grid_creator();

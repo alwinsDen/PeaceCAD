@@ -12,7 +12,7 @@ static cairo_surface_t *surface = NULL;
 //struct definitions
 struct CustomPosData {
     std::string xyz;
-    GtkTextBuffer *widget;
+    GtkTextBuffer *widget{};
 };
 
 //don't use the static keyword here.
@@ -59,12 +59,22 @@ void draw_cb(
     cairo_paint(cr);
     //conditional check for the grid state
     if (get_grid_state()){
+        //if the drawing area is considered - get dimensions.
+        GtkAllocation allocation;
+        gtk_widget_get_allocation(reinterpret_cast<GtkWidget *>(drawing_area), &allocation);
+        int ww = allocation.width;
+        int hh = allocation.height;
         cairo_set_source_rgb(cr, 0, 0, 0);
         cairo_set_line_width(cr, 1);
         int grid_spacing = 20;
-        for (int i = 0; i < 500; i += grid_spacing) {
+        for (int i = 0; i < ww; i += grid_spacing) {
             cairo_move_to(cr, i, 0);
-            cairo_line_to(cr, i, 500);
+            cairo_line_to(cr, i, hh);
+            cairo_stroke(cr);
+        }
+        for (int i = 0; i < hh; i += grid_spacing) {
+            cairo_move_to(cr, 0, i);
+            cairo_line_to(cr, ww, i);
             cairo_stroke(cr);
         }
     }

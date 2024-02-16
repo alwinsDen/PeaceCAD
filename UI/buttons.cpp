@@ -9,9 +9,9 @@
 #include "../globals.h"
 
 //A function to draw the grids
-void create_grid(GtkWidget *widget, cairo_t *cr,gpointer user_data) {
+void create_grid(GtkDrawingArea *widget, gpointer user_data) {
 //    set_grid_state(!get_grid_state());
-    set_grid_state(true);
+    set_grid_state(!get_grid_state());
     gtk_widget_queue_draw(GTK_WIDGET(user_data));
 };
 
