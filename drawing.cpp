@@ -5,6 +5,7 @@
 #include "drawing.h"
 #include <gtk/gtk.h>
 #include "UI/buttons.h"
+#include "globals.h"
 
 static cairo_surface_t *surface = NULL;
 
@@ -56,6 +57,17 @@ void draw_cb(
 ) {
     cairo_set_source_surface(cr, surface, 0, 0);
     cairo_paint(cr);
+    //conditional check for the grid state
+    if (get_grid_state()){
+        cairo_set_source_rgb(cr, 0, 0, 0);
+        cairo_set_line_width(cr, 1);
+        int grid_spacing = 20;
+        for (int i = 0; i < 500; i += grid_spacing) {
+            cairo_move_to(cr, i, 0);
+            cairo_line_to(cr, i, 500);
+            cairo_stroke(cr);
+        }
+    }
 }
 
 //drag functions and the draw brush
@@ -112,8 +124,8 @@ void get_cursor_position(
         gpointer user_data
 ) {
     //deserializing a struct
-    CustomPosData *data = static_cast<CustomPosData* >(user_data);
-    pos_targets(data->widget,std::to_string(x),std::to_string(y));
+    CustomPosData *data = static_cast<CustomPosData * >(user_data);
+    pos_targets(data->widget, std::to_string(x), std::to_string(y));
 }
 
 void pressed(GtkGestureClick *gesture,
@@ -139,20 +151,20 @@ void activate_drawing(GtkApplication *app, gpointer user_data) {
     GtkGesture *drag;
     GtkGesture *press;
     window = gtk_application_window_new(app);
-    gtk_window_set_title(GTK_WINDOW(window), "Drawing area");
+    gtk_window_set_title(GTK_WINDOW(window), "PeaceCAD v0.0.1");
 
     //adding box the frame
     box = gtk_box_new(GTK_ORIENTATION_VERTICAL, 0);
     gtk_widget_set_halign(box, GTK_ALIGN_CENTER);
     gtk_widget_set_valign(box, GTK_ALIGN_CENTER);
-    gtk_window_set_child(GTK_WINDOW(window),box);
+    gtk_window_set_child(GTK_WINDOW(window), box);
 
     //the signal for closing function
     g_signal_connect(window, "destroy", G_CALLBACK(close_window), NULL);
 
     frame = gtk_frame_new(NULL);
-
-
+    gtk_widget_set_margin_top(GTK_WIDGET(frame), 5);
+    gtk_widget_set_margin_end(GTK_WIDGET(frame), 5);
     drawing_area = gtk_drawing_area_new();
     gtk_widget_set_size_request(drawing_area, 1920, 1080);
     gtk_frame_set_child(GTK_FRAME(frame), drawing_area);
@@ -165,8 +177,11 @@ void activate_drawing(GtkApplication *app, gpointer user_data) {
     GtkWidget *text_box;
     GtkTextBuffer *buffer;
     text_box = gtk_text_view_new();
+    gtk_widget_set_margin_top(GTK_WIDGET(text_box), 4);
+    gtk_widget_set_margin_bottom(GTK_WIDGET(text_box), 4);
+    gtk_widget_set_margin_start(GTK_WIDGET(text_box), 10);
     gtk_text_view_set_editable(GTK_TEXT_VIEW(text_box), FALSE);
-    buffer =  gtk_text_view_get_buffer(GTK_TEXT_VIEW(text_box));
+    buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(text_box));
 
     //here we are defining the content for the CustomPostData struct
     CustomPosData *data = new CustomPosData();
@@ -175,7 +190,7 @@ void activate_drawing(GtkApplication *app, gpointer user_data) {
 
     //Adding button to the UI
     GtkWidget *button = gtk_button_new_with_label("Click Here");
-    g_signal_connect(button,"clicked",G_CALLBACK(clicked_button),NULL);
+    g_signal_connect(button, "clicked", G_CALLBACK(clicked_button), NULL);
 
     //trying to link motion position
     GtkEventController *motion = gtk_event_controller_motion_new();
@@ -198,9 +213,20 @@ void activate_drawing(GtkApplication *app, gpointer user_data) {
 
     g_signal_connect(press, "pressed", G_CALLBACK(pressed), drawing_area);
 
+    //add clicker to grid creation
+    GtkWidget *grid_btt_ref = grid_creator();
+    g_signal_connect(grid_btt_ref, "clicked", G_CALLBACK(create_grid), drawing_area);
+    GtkWidget *box_inst_ref = writ_button();
+    gtk_box_append(GTK_BOX(box_inst_ref), grid_btt_ref);
+
+    //defining a new GTK box with Horizontal orientation
+    GtkWidget *vert_boxed = gtk_box_new(GTK_ORIENTATION_HORIZONTAL, 5);
+    gtk_box_append(GTK_BOX(vert_boxed), box_inst_ref);
+    gtk_box_append(GTK_BOX(vert_boxed), frame);
+
     //GTK Box material controls
-    gtk_box_append(GTK_BOX(box),frame);
-    gtk_box_append(GTK_BOX(box),text_box);
+    gtk_box_append(GTK_BOX(box), vert_boxed);
+    gtk_box_append(GTK_BOX(box), text_box);
 //    gtk_box_append(GTK_BOX(box),button); //unused button
 
     gtk_window_present(GTK_WINDOW(window));
