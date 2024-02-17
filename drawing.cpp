@@ -64,9 +64,9 @@ void draw_cb(
         gtk_widget_get_allocation(reinterpret_cast<GtkWidget *>(drawing_area), &allocation);
         int ww = allocation.width;
         int hh = allocation.height;
-        cairo_set_source_rgb(cr, 0, 0, 0);
+        cairo_set_source_rgb(cr, 0.7, 0.7, 0.7);
         cairo_set_line_width(cr, 1);
-        int grid_spacing = 20;
+        int grid_spacing = 40;
         for (int i = 0; i < ww; i += grid_spacing) {
             cairo_move_to(cr, i, 0);
             cairo_line_to(cr, i, hh);
@@ -84,7 +84,7 @@ void draw_cb(
 void draw_brush(GtkWidget *widget, double x, double y) {
     cairo_t *cr;
     cr = cairo_create(surface);
-    cairo_rectangle(cr, x - 3, y - 3, 6, 6);
+    cairo_rectangle(cr, x - 3, y - 3, 4, 4);
     cairo_fill(cr);
     cairo_destroy(cr);
     // invalidating drawing area.
